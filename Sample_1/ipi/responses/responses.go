@@ -6,3 +6,7 @@ type UserResponse struct {
 	Gender   string `json:"gender"`
 	Birthday string `json:"birthday"`
 }
+type FailedRequest struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}

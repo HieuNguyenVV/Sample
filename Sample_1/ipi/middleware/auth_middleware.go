@@ -1,10 +1,10 @@
-package middleware
+package middleware1
 
 import (
+	"Sample_1/ipi/responses"
+	"encoding/json"
 	"errors"
 	"net/http"
-
-	"github.com/titpetric/factory/resputil"
 )
 
 type Tocken struct {
@@ -33,8 +33,11 @@ func (t *Tocken) Authenticator() func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, err := t.Authenticate(r)
 			if err != nil {
+				failReq := responses.FailedRequest{false, err.Error()}
+				fail, _ := json.Marshal(failReq)
 				w.WriteHeader(http.StatusForbidden)
-				resputil.JSON(w, err)
+				w.Write(fail)
+				// resputil.JSON(w, err)
 				return
 			}
 			next.ServeHTTP(w, r)

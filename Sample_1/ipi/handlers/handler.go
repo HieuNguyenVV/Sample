@@ -3,9 +3,8 @@ package handlers
 import (
 	"Sample_1/ipi/responses"
 	"encoding/json"
+	"log"
 	"net/http"
-
-	"github.com/titpetric/factory/resputil"
 )
 
 type InforUser interface {
@@ -27,7 +26,8 @@ func (m *user) GetInforUser(w http.ResponseWriter, r *http.Request) {
 	resp, err := json.Marshal(res)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		resputil.JSON(w, err)
+		//resputil.JSON(w, err)
+		log.Printf("Error happened in JSON marshal. Err: %s", err)
 		return
 	}
 	w.Write(resp)
