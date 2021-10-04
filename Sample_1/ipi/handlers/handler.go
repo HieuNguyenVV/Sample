@@ -4,6 +4,8 @@ import (
 	"Sample_1/ipi/responses"
 	"encoding/json"
 	"net/http"
+
+	"github.com/titpetric/factory/resputil"
 )
 
 type InforUser interface {
@@ -22,6 +24,12 @@ func (m *user) GetInforUser(w http.ResponseWriter, r *http.Request) {
 		Gender:   "Male",
 		Birthday: "16/02/1998",
 	}
+	resp, err := json.Marshal(res)
+	if err != nil {
+		resputil.JSON(w, err)
+		http.Error(w, "", http.StatusInternalServerError)
+		return
+	}
+	w.Write(resp)
 
-	json.NewEncoder(w).Encode(res)
 }

@@ -2,43 +2,41 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/titpetric/factory/resputil"
 )
 
-type JWT struct {
+type Tocken struct {
 	tokenClaim string
 }
 
-func New() *JWT {
-	jwt := &JWT{
+func New() *Tocken {
+	t := &Tocken{
 		tokenClaim: "Bearer AKcqHRCTHaBLnznmH3fw6bRSMBSZpa9tAngkKnGydBmST5XFGpxzgsGMuT3z7QsZ",
 	}
-	return jwt
+	return t
 }
 
-func (jwt *JWT) Authenticate(r *http.Request) (string, error) {
-	auth_jwt := r.Header.Get("Authorization")
-	fmt.Println(auth_jwt)
-	if auth_jwt == "" {
+func (t *Tocken) Authenticate(r *http.Request) (string, error) {
+	tocken := r.Header.Get("Authorization")
+	if tocken == "" {
 		return "", errors.New("Empty JWT")
 	}
-	if auth_jwt != jwt.tokenClaim {
+	if tocken != t.tokenClaim {
 		return "", errors.New("invalid JWT")
 	}
-	return auth_jwt, nil
+	return tocken, nil
 }
-func (jwt *JWT) Authenticator() func(http.Handler) http.Handler {
+func (t *Tocken) Authenticator() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, err := jwt.Authenticate(r)
+			_, err := t.Authenticate(r)
 			if err != nil {
 				resputil.JSON(w, err)
+				http.Error(w, "", http.StatusForbidden)
 				return
 			}
-			//json.NewEncoder(w).Encode(auth_jwt)
 			next.ServeHTTP(w, r)
 		})
 	}

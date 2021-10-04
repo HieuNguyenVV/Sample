@@ -11,10 +11,11 @@ import (
 func main() {
 	r := chi.NewRouter()
 	r.Group(func(r chi.Router) {
+		r.Use(middleware.SetHeader("Content-Type", "application/json"))
 		ath := middleware.New()
 		r.Use(ath.Authenticator())
 		h := handlers.NewUser()
-		r.Get("/ipi/me", h.GetInforUser)
+		r.Get("/api/me", h.GetInforUser)
 		http.ListenAndServe(":8080", r)
 	})
 }
