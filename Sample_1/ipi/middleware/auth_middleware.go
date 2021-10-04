@@ -21,10 +21,10 @@ func New() *Tocken {
 func (t *Tocken) Authenticate(r *http.Request) (string, error) {
 	tocken := r.Header.Get("Authorization")
 	if tocken == "" {
-		return "", errors.New("Empty JWT")
+		return "", errors.New("Empty Tocken")
 	}
 	if tocken != t.tokenClaim {
-		return "", errors.New("invalid JWT")
+		return "", errors.New("invalid Tocken")
 	}
 	return tocken, nil
 }
@@ -33,8 +33,8 @@ func (t *Tocken) Authenticator() func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, err := t.Authenticate(r)
 			if err != nil {
+				w.WriteHeader(http.StatusForbidden)
 				resputil.JSON(w, err)
-				http.Error(w, "", http.StatusForbidden)
 				return
 			}
 			next.ServeHTTP(w, r)

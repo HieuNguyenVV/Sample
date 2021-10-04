@@ -26,8 +26,8 @@ func (m *user) GetInforUser(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := json.Marshal(res)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		resputil.JSON(w, err)
-		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 	w.Write(resp)
