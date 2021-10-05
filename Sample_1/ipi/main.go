@@ -22,8 +22,7 @@ func main() {
 	r := chi.NewRouter()
 	dbmanager, err := psql.NewDbmanager()
 	if err != nil {
-		log.Printf("error conecting database . Err: %s", err)
-		return
+		log.Fatalf("error conecting database . Err: %s", err)
 	}
 	r.Group(func(r chi.Router) {
 		connecting := repositories.NewUserRepository(dbmanager)
@@ -33,11 +32,7 @@ func main() {
 		ath := middleware1.New(connecting)
 		r.Use(ath.Authenticator())
 
-		h, err := handlers.NewUser(connecting)
-		if err != nil {
-			log.Printf("Error happened in connect to handler. Err: %s", err)
-			return
-		}
+		h := handlers.NewUser(connecting)
 		r.Get("/api/me", h.GetInforUser)
 		http.ListenAndServe(":8080", r)
 	})

@@ -2,7 +2,7 @@ package middleware1
 
 import (
 	"Sample_1/ipi/repositories"
-	"Sample_1/ipi/responses"
+	"Sample_1/ipi/utils"
 	"context"
 	"encoding/json"
 	"errors"
@@ -38,10 +38,13 @@ func (t *Tocken) Authenticator() func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			id, err := t.Authenticate(r)
 			if err != nil {
-				failReq := responses.FailedRequest{false, err.Error()}
+				failReq := utils.HandleHTTPError(err)
 				fail, err := json.Marshal(failReq)
 				if err != nil {
+					failReq := utils.HandleHTTPError(err)
+					fail, err := json.Marshal(failReq)
 					w.WriteHeader(http.StatusInternalServerError)
+					w.Write(fail)
 					log.Printf("Error happened in JSON marshal. Err: %s", err)
 					return
 				}
