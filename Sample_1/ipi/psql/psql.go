@@ -1,10 +1,10 @@
 package psql
 
 import (
+	"Sample_1/database"
 	"Sample_1/ipi/models"
 	"log"
 
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -13,7 +13,8 @@ type Dbmanager struct {
 }
 
 func NewDbmanager() (*Dbmanager, error) {
-	db, err := gorm.Open(postgres.Open("host=localhost user=postgres password=1234 dbname=Hieu port=5432 sslmode=disable TimeZone=Asia/Ho_Chi_Minh"))
+	//db, err := gorm.Open(postgres.Open("host=localhost user=postgres password=1234 dbname=Hieu port=5432 sslmode=disable TimeZone=Asia/Ho_Chi_Minh"))
+	db, err := database.NewGormDB()
 	if err != nil {
 		log.Fatal("error conecting dattabase", err)
 	}

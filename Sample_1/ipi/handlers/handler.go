@@ -38,7 +38,7 @@ func (m *user) GetInforUser(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error happened in mapping. Err: %s", err)
 		return
 	}
-	resp, err := json.Marshal(result)
+	resp, err := json.Marshal(user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("Error happened in JSON marshal. Err: %s", err)

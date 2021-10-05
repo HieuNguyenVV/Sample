@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Sample_1/helper"
 	"Sample_1/ipi/handlers"
 	middleware1 "Sample_1/ipi/middleware"
 	"Sample_1/ipi/psql"
@@ -13,6 +14,10 @@ import (
 )
 
 func main() {
+	err := helper.AutoBindConfig("config.yml")
+	if err != nil {
+		panic(err)
+	}
 	r := chi.NewRouter()
 	dbmanager, err := psql.NewDbmanager()
 	if err != nil {
