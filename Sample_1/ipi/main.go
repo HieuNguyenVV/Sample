@@ -16,7 +16,8 @@ import (
 func main() {
 	err := helper.AutoBindConfig("config.yml")
 	if err != nil {
-		panic(err)
+		log.Printf("error bind config file. Err: %s", err)
+		return
 	}
 	r := chi.NewRouter()
 	dbmanager, err := psql.NewDbmanager()
