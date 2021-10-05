@@ -1,35 +1,47 @@
 package handlers
 
 import (
+	"Sample_1/ipi/repositories"
 	"Sample_1/ipi/responses"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/jinzhu/copier"
 )
 
-type InforUser interface {
-	GetInforUser(w http.ResponseWriter, r *http.Request)
-}
 type user struct {
+	userRepository repositories.UserRepositories
 }
 
-func NewUser() InforUser {
-	return &user{}
+func NewUser(userRepository repositories.UserRepositories) (*user, error) {
+	return &user{
+		userRepository: userRepository,
+	}, nil
 }
+
 func (m *user) GetInforUser(w http.ResponseWriter, r *http.Request) {
-	res := responses.UserResponse{
-		Fullname: "Nguyen Van Hieu",
-		Username: "HieuNV38",
-		Gender:   "Male",
-		Birthday: "16/02/1998",
-	}
-	resp, err := json.Marshal(res)
+	tocken := r.Header.Get("Authorization")
+	fmt.Println(tocken)
+	result, err := m.userRepository.GetUserbyToken(tocken)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		//resputil.JSON(w, err)
+		log.Printf("Error happened in reading data to db. Err: %s", err)
+		return
+	}
+	user := responses.UserResponse{}
+	err = copier.Copy(&user, &result)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("Error happened in mapping. Err: %s", err)
+		return
+	}
+	resp, err := json.Marshal(result)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("Error happened in JSON marshal. Err: %s", err)
 		return
 	}
 	w.Write(resp)
-
 }

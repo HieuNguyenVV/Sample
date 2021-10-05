@@ -1,29 +1,37 @@
 package middleware1
 
 import (
+	"Sample_1/ipi/repositories"
 	"Sample_1/ipi/responses"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 )
 
 type Tocken struct {
-	tokenClaim string
+	//tokenClaim string
+	userRepository repositories.UserRepositories
 }
 
-func New() *Tocken {
-	t := &Tocken{
-		tokenClaim: "Bearer AKcqHRCTHaBLnznmH3fw6bRSMBSZpa9tAngkKnGydBmST5XFGpxzgsGMuT3z7QsZ",
+func New(userRepository repositories.UserRepositories) *Tocken {
+	// t := &Tocken{
+	// 	tokenClaim: "Bearer gEnwYRcEbgHAyrzWYtWRYrPSmxCmpJQv9xmAPe4RsDaBdyB47UB2JPbJRCCbmd7WmMKpaEFBQAc3H423",
+	// }
+	return &Tocken{
+		userRepository: userRepository,
 	}
-	return t
 }
 
 func (t *Tocken) Authenticate(r *http.Request) (string, error) {
 	tocken := r.Header.Get("Authorization")
+	fmt.Println(tocken)
 	if tocken == "" {
 		return "", errors.New("Empty Tocken")
 	}
-	if tocken != t.tokenClaim {
+	result, _ := t.userRepository.GetTocken(tocken)
+	if result != true {
 		return "", errors.New("invalid Tocken")
 	}
 	return tocken, nil
@@ -34,10 +42,14 @@ func (t *Tocken) Authenticator() func(http.Handler) http.Handler {
 			_, err := t.Authenticate(r)
 			if err != nil {
 				failReq := responses.FailedRequest{false, err.Error()}
-				fail, _ := json.Marshal(failReq)
+				fail, err := json.Marshal(failReq)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					log.Printf("Error happened in JSON marshal. Err: %s", err)
+					return
+				}
 				w.WriteHeader(http.StatusForbidden)
 				w.Write(fail)
-				// resputil.JSON(w, err)
 				return
 			}
 			next.ServeHTTP(w, r)
