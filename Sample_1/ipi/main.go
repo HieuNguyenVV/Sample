@@ -3,8 +3,8 @@ package main
 import (
 	"Sample_1/ipi/handlers"
 	middleware1 "Sample_1/ipi/middleware"
+	"Sample_1/ipi/psql"
 	"Sample_1/ipi/repositories"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -14,14 +14,13 @@ import (
 
 func main() {
 	r := chi.NewRouter()
-
+	dbmanager, err := psql.NewDbmanager()
+	if err != nil {
+		log.Printf("error conecting database . Err: %s", err)
+		return
+	}
 	r.Group(func(r chi.Router) {
-		connecting, err := repositories.NewDbmanager()
-		if err != nil {
-			log.Fatal("error conecting database", err)
-			fmt.Println("err")
-			return
-		}
+		connecting := repositories.NewUserRepository(dbmanager)
 
 		r.Use(middleware.SetHeader("Content-Type", "application/json"))
 
@@ -30,7 +29,8 @@ func main() {
 
 		h, err := handlers.NewUser(connecting)
 		if err != nil {
-			panic(err)
+			log.Printf("Error happened in connect to handler. Err: %s", err)
+			return
 		}
 		r.Get("/api/me", h.GetInforUser)
 		http.ListenAndServe(":8080", r)

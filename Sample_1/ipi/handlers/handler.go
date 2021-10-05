@@ -4,7 +4,6 @@ import (
 	"Sample_1/ipi/repositories"
 	"Sample_1/ipi/responses"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -12,19 +11,21 @@ import (
 )
 
 type user struct {
-	userRepository repositories.UserRepositories
+	userRepository repositories.IUserRepository
 }
 
-func NewUser(userRepository repositories.UserRepositories) (*user, error) {
+func NewUser(userRepository repositories.IUserRepository) (*user, error) {
 	return &user{
 		userRepository: userRepository,
 	}, nil
 }
 
 func (m *user) GetInforUser(w http.ResponseWriter, r *http.Request) {
-	tocken := r.Header.Get("Authorization")
-	fmt.Println(tocken)
-	result, err := m.userRepository.GetUserbyToken(tocken)
+	ctx := r.Context()
+	id := ctx.Value("keyID")
+	Id := id.(int64)
+	result, err := m.userRepository.GetUserbyID(Id)
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("Error happened in reading data to db. Err: %s", err)

@@ -1,0 +1,4 @@
+2021-10-04T21:13:52.690+0700	DEBUG	grpc/main.go:48	Trying to hit GET request for www.sogo.com
+2021-10-04T21:13:52.692+0700	ERROR	grpc/main.go:51	Error fetching URL www.sogo.com : Error = Get "www.sogo.com": unsupported protocol scheme ""
+2021-10-04T21:13:52.692+0700	DEBUG	grpc/main.go:48	Trying to hit GET request for http://www.sogo.com
+2021-10-04T21:13:53.608+0700	INFO	grpc/main.go:53	Success! statusCode = 200 OK for URL http://www.sogo.com
